@@ -1,0 +1,84 @@
+﻿<mah:MetroWindow
+    x:Class="ProjectExplorer.Ui.View.FileStatusWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ProjectExplorer.Ui.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:ProjectExplorer.Ui.ViewModel"
+    Title="Files"
+    Width="800"
+    Height="450"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    Loaded="FileStatusWindow_OnLoaded"
+    ResizeMode="CanResizeWithGrip"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Window.DataContext>
+        <viewModel:FileStatusWindowViewModel />
+    </Window.DataContext>
+
+    <DockPanel LastChildFill="True">
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding Info}" />
+        </StatusBar>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <DataGrid
+                Grid.Row="0"
+                IsReadOnly="True"
+                ItemsSource="{Binding Files}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Name}"
+                        Header="Name" />
+                    <DataGridTextColumn
+                        Width="2*"
+                        Binding="{Binding FilePath}"
+                        Header="Path" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Status}"
+                        Header="Status" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Separator Grid.Row="1" />
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <Button
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Command="{Binding CopyToClipboardCommand}"
+                    Content="Copy" />
+                <Button
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ExportCommand}"
+                    Content="Export" />
+            </StackPanel>
+
+            <Button
+                Grid.Row="2"
+                Width="60"
+                HorizontalAlignment="Right"
+                Click="ButtonBase_OnClick"
+                Content="Close" />
+        </Grid>
+    </DockPanel>
+
+
+</mah:MetroWindow>

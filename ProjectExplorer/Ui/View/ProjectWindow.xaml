@@ -1,0 +1,91 @@
+﻿<mah:MetroWindow
+    x:Class="ProjectExplorer.Ui.View.ProjectWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ProjectExplorer.Ui.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:ProjectExplorer.Ui.ViewModel"
+    Title="{Binding WindowTitle}"
+    Width="500"
+    Height="150"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    Loaded="ProjectWindow_OnLoaded"
+    ResizeMode="NoResize"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Window.DataContext>
+        <viewModel:ProjectWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            Content="Name:" />
+        <TextBox
+            Grid.Row="0"
+            Grid.Column="1"
+            Text="{Binding Project.Name}" />
+
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            Content="Path:" />
+        <TextBox
+            Grid.Row="1"
+            Grid.Column="1"
+            Text="{Binding Project.Path}" />
+        <Button
+            Grid.Row="1"
+            Grid.Column="2"
+            Width="40"
+            Command="{Binding BrowseSolutionCommand}"
+            Content="..." />
+
+        <Separator
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3" />
+
+        <StackPanel
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            FlowDirection="RightToLeft"
+            Orientation="Horizontal">
+            <Button
+                Width="60"
+                Command="{Binding CloseCommand}"
+                Content="Cancel" />
+            <Button
+                Width="60"
+                Command="{Binding ValidateCommand}"
+                Content="Ok" />
+        </StackPanel>
+
+        <Label
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Content="{Binding InfoMessage}" />
+    </Grid>
+</mah:MetroWindow>

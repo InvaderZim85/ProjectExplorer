@@ -1,0 +1,416 @@
+﻿<mah:MetroWindow
+    x:Class="ProjectExplorer.Ui.View.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="clr-namespace:ProjectExplorer.Ui.Converter"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:local="clr-namespace:ProjectExplorer.Ui.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="clr-namespace:ProjectExplorer.Ui.View"
+    xmlns:viewModel="clr-namespace:ProjectExplorer.Ui.ViewModel"
+    Title="{Binding WindowTitle}"
+    Width="1260"
+    Height="700"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    Loaded="MainWindow_OnLoaded"
+    ResizeMode="CanResizeWithGrip"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
+    <Window.DataContext>
+        <viewModel:MainWindowViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converter:NegateBoolConverter x:Key="NegateBoolConverter" />
+    </Window.Resources>
+
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>
+            <ToggleButton x:Name="ToggleButtonOpenSettings" Content="{iconPacks:Modern Kind=Settings}" />
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
+
+    <!--  Flyout  -->
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl>
+            <mah:Flyout
+                MinWidth="350"
+                Background="#FF323232"
+                CloseButtonVisibility="Visible"
+                Header="Settings"
+                IsModal="True"
+                IsOpen="{Binding ElementName=ToggleButtonOpenSettings, Path=IsChecked, Mode=TwoWay}"
+                Position="Right">
+                <local:SettingsControl x:Name="SettingsControl" />
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
+
+    <DockPanel LastChildFill="True">
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding Info}" />
+        </StatusBar>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Content="Projects"
+                Style="{StaticResource Headline}" />
+
+            <Separator
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
+
+            <DataGrid
+                Grid.Row="2"
+                Grid.Column="0"
+                IsReadOnly="True"
+                ItemsSource="{Binding Projects}"
+                SelectedItem="{Binding SelectedProject}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding Name}"
+                        Header="Name" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Path}"
+                        Header="Path" />
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding Branch}"
+                        Header="Branch" />
+                    <DataGridTextColumn
+                        Width="200"
+                        Binding="{Binding Status}"
+                        Header="Status" />
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding StatusInfo}"
+                        Header="Info" />
+                    <DataGridTextColumn
+                        Width="130"
+                        Binding="{Binding LastCheck, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                        Header="Last check" />
+                </DataGrid.Columns>
+
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Command="{Binding AddProjectCommand}"
+                            Header="Add"
+                            InputGestureText="A">
+                            <MenuItem.Icon>
+                                <iconPacks:PackIconUnicons
+                                    Width="16"
+                                    Height="16"
+                                    Foreground="Green"
+                                    Kind="FilePlusLine" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding EditProjectCommand}"
+                            Header="Edit"
+                            InputGestureText="E"
+                            IsEnabled="{Binding OptionsEnabled}">
+                            <MenuItem.Icon>
+                                <iconPacks:PackIconUnicons
+                                    Width="16"
+                                    Height="16"
+                                    Foreground="Orange"
+                                    Kind="FileEditAltLine" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding DeleteProjectCommand}"
+                            Header="Delete"
+                            InputGestureText="D"
+                            IsEnabled="{Binding OptionsEnabled}">
+                            <MenuItem.Icon>
+                                <iconPacks:PackIconUnicons
+                                    Width="16"
+                                    Height="16"
+                                    Foreground="Red"
+                                    Kind="FileMinusLine" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem
+                            Command="{Binding CleanFolderCommand}"
+                            Header="Clean"
+                            InputGestureText="L"
+                            IsEnabled="{Binding OptionsEnabled}">
+                            <MenuItem.Icon>
+                                <iconPacks:PackIconModern
+                                    Width="16"
+                                    Height="16"
+                                    Kind="Clean" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+
+                        <Separator />
+
+                        <MenuItem Header="Git">
+                            <MenuItem
+                                Command="{Binding ShowFileInfosCommand}"
+                                Header="Show files"
+                                InputGestureText="F"
+                                IsEnabled="{Binding OptionsEnabled}">
+                                <MenuItem.Icon>
+                                    <iconPacks:PackIconUnicons
+                                        Width="16"
+                                        Height="16"
+                                        Kind="FileSearchAltLine" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+
+                            <MenuItem
+                                Command="{Binding ShowBranchListCommand}"
+                                Header="Branches"
+                                InputGestureText="B"
+                                IsEnabled="{Binding OptionsEnabled}">
+                                <MenuItem.Icon>
+                                    <iconPacks:PackIconUnicons
+                                        Width="16"
+                                        Height="16"
+                                        Kind="CodeBranchLine" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+
+                            <Separator />
+
+                            <MenuItem
+                                Command="{Binding GitCleanFolderCommand}"
+                                Header="Clean"
+                                InputGestureText="G"
+                                IsEnabled="{Binding OptionsEnabled}">
+                                <MenuItem.Icon>
+                                    <iconPacks:PackIconModern
+                                        Width="16"
+                                        Height="16"
+                                        Kind="Clean" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuItem>
+
+                        <Separator />
+
+                        <MenuItem
+                            Command="{Binding OpenProjectInCommand}"
+                            CommandParameter="VisualStudio"
+                            Header="Open in Visual Studio"
+                            InputGestureText="V"
+                            IsEnabled="{Binding OpenInVisualStudioEnabled}">
+                            <MenuItem.Icon>
+                                <iconPacks:PackIconSimpleIcons
+                                    Width="16"
+                                    Height="16"
+                                    Foreground="#9c72ce"
+                                    Kind="VisualStudio" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding OpenProjectInCommand}"
+                            CommandParameter="VisualStudioCode"
+                            Header="Open in Visual Studio Code"
+                            InputGestureText="C"
+                            IsEnabled="{Binding OpenInVisualStudioCodeEnabled}">
+                            <MenuItem.Icon>
+                                <iconPacks:PackIconSimpleIcons
+                                    Width="16"
+                                    Height="16"
+                                    Foreground="#23aaf2"
+                                    Kind="VisualStudioCode" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding RevealInExplorerCommand}"
+                            Header="Reveal in explorer"
+                            InputGestureText="R"
+                            IsEnabled="{Binding OptionsEnabled}">
+                            <MenuItem.Icon>
+                                <iconPacks:PackIconUnicons
+                                    Width="16"
+                                    Height="16"
+                                    Kind="FolderOpenLine" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+
+                <DataGrid.InputBindings>
+                    <KeyBinding Key="A" Command="{Binding AddProjectCommand}" />
+                    <KeyBinding Key="E" Command="{Binding EditProjectCommand}" />
+                    <KeyBinding Key="D" Command="{Binding DeleteProjectCommand}" />
+                    <KeyBinding
+                        Key="V"
+                        Command="{Binding OpenProjectInCommand}"
+                        CommandParameter="VisualStudio" />
+                    <KeyBinding
+                        Key="C"
+                        Command="{Binding OpenProjectInCommand}"
+                        CommandParameter="VisualStudioCode" />
+                    <KeyBinding Key="L" Command="{Binding CleanFolderCommand}" />
+                    <KeyBinding Key="R" Command="{Binding RevealInExplorerCommand}" />
+                    <KeyBinding Key="G" Command="{Binding GitCleanFolderCommand}" />
+                    <KeyBinding Key="F" Command="{Binding ShowFileInfosCommand}" />
+                    <KeyBinding Key="B" Command="{Binding ShowBranchListCommand}" />
+                </DataGrid.InputBindings>
+            </DataGrid>
+
+            <!--  Options  -->
+            <StackPanel Grid.Row="2" Grid.Column="1">
+                <Button Command="{Binding AddProjectCommand}" ToolTip="Adds a new entry. Key 'A'">
+                    <iconPacks:PackIconUnicons
+                        Width="16"
+                        Height="16"
+                        Foreground="Green"
+                        Kind="FilePlusAltLine" />
+                </Button>
+                <Button
+                    Command="{Binding EditProjectCommand}"
+                    IsEnabled="{Binding OptionsEnabled}"
+                    ToolTip="Edits the selected entry. Key 'E'">
+                    <iconPacks:PackIconUnicons
+                        Width="16"
+                        Height="16"
+                        Foreground="Orange"
+                        Kind="FileEditAltLine" />
+                </Button>
+                <Button
+                    Command="{Binding DeleteProjectCommand}"
+                    IsEnabled="{Binding OptionsEnabled}"
+                    ToolTip="Deletes the selected entry. Key 'D'">
+                    <iconPacks:PackIconUnicons
+                        Width="16"
+                        Height="16"
+                        Foreground="Red"
+                        Kind="FileMinusAltLine" />
+                </Button>
+                <Button
+                    Command="{Binding CleanFolderCommand}"
+                    IsEnabled="{Binding OptionsEnabled}"
+                    ToolTip="Cleans the 'bin' and 'obj' folder. Key 'L'">
+                    <iconPacks:PackIconModern
+                        Width="16"
+                        Height="16"
+                        Kind="Clean" />
+                </Button>
+                <Button
+                    Command="{Binding OpenProjectInCommand}"
+                    CommandParameter="VisualStudio"
+                    IsEnabled="{Binding OpenInVisualStudioEnabled}"
+                    ToolTip="Opens the selected entry in Visual Studio. Key 'V'">
+                    <iconPacks:PackIconSimpleIcons
+                        Width="16"
+                        Height="16"
+                        Foreground="#9c72ce"
+                        Kind="VisualStudio" />
+                </Button>
+                <Button
+                    Command="{Binding OpenProjectInCommand}"
+                    CommandParameter="VisualStudioCode"
+                    IsEnabled="{Binding OpenInVisualStudioCodeEnabled}"
+                    ToolTip="Opens the selected entry in Visual Studio Code. Key 'C'">
+                    <iconPacks:PackIconSimpleIcons
+                        Width="16"
+                        Height="16"
+                        Foreground="#23aaf2"
+                        Kind="VisualStudioCode" />
+                </Button>
+                <Button
+                    Command="{Binding RevealInExplorerCommand}"
+                    IsEnabled="{Binding OptionsEnabled}"
+                    ToolTip="Opens the selected entry in the Explorer. Key 'G'">
+                    <iconPacks:PackIconUnicons
+                        Width="16"
+                        Height="16"
+                        Kind="FolderOpenLine" />
+                </Button>
+                <Button
+                    Command="{Binding ShowFileInfosCommand}"
+                    IsEnabled="{Binding OptionsEnabled}"
+                    ToolTip="Shows the new / changed / deleted files. Key 'F'">
+                    <iconPacks:PackIconUnicons
+                        Width="16"
+                        Height="16"
+                        Kind="FileSearchAltLine" />
+                </Button>
+                <Button
+                    Command="{Binding ShowBranchListCommand}"
+                    IsEnabled="{Binding OptionsEnabled}"
+                    ToolTip="Shows the branch list. Key 'B'">
+                    <iconPacks:PackIconUnicons
+                        Width="16"
+                        Height="16"
+                        Kind="CodeBranchLine" />
+                </Button>
+            </StackPanel>
+
+            <Separator
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" />
+
+            <StackPanel
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal">
+                <Button
+                    Width="60"
+                    Command="{Binding LoadProjectsCommand}"
+                    Content="Reload" />
+                <Button
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Command="{Binding CopyToClipboardCommand}"
+                    Content="Copy" />
+                <Button
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ExportCommand}"
+                    Content="Export" />
+            </StackPanel>
+
+            <StackPanel
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <CheckBox Content="Auto refresh" IsChecked="{Binding TimerEnabled}" />
+                <mah:NumericUpDown
+                    Width="75"
+                    Margin="3"
+                    IsEnabled="{Binding TimerEnabled, Converter={StaticResource NegateBoolConverter}}"
+                    NumericInputMode="Numbers"
+                    Value="{Binding CheckTime}" />
+                <Label Content="min." />
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+
+</mah:MetroWindow>
