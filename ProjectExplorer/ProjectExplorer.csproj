@@ -1,13 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <Version>24.198.2.1250</Version>
+    <FileVersion>24.198.2.1250</FileVersion>
+    <AssemblyVersion>24.198.2.1250</AssemblyVersion>
+    <ApplicationIcon>ProjectExplorerIcon.ico</ApplicationIcon>
   </PropertyGroup>
-
+  <ItemGroup>
+    <Resource Include="ProjectExplorerIcon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
@@ -24,5 +29,4 @@
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="ZimLabs.TableCreator" Version="2.1.1" />
   </ItemGroup>
-
 </Project>

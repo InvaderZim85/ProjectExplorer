@@ -38,6 +38,22 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// </summary>
     private readonly Version _version = Assembly.GetExecutingAssembly().GetName().Version ?? new();
 
+    /// <summary>
+    /// Contains the path of visual studio
+    /// </summary>
+    /// <remarks>
+    /// This value is needed to activate / deactivate the <see cref="OpenInVisualStudioEnabled"/> / <see cref="OpenInVisualStudioCodeEnabled"/> options
+    /// </remarks>
+    private string _visualStudioPath = string.Empty;
+
+    /// <summary>
+    /// Contains the path of visual studio code
+    /// </summary>
+    /// <remarks>
+    /// This value is needed to activate / deactivate the <see cref="OpenInVisualStudioEnabled"/> / <see cref="OpenInVisualStudioCodeEnabled"/> options
+    /// </remarks>
+    private string _visualStudioCodePath = string.Empty;
+
     #region Various
     /// <summary>
     /// Gets or sets the value which indicates whether the "open in visual studio" option is enabled
@@ -131,6 +147,8 @@ internal partial class MainWindowViewModel : ViewModelBase
     partial void OnSelectedProjectChanged(ProjectEntry? value)
     {
         OptionsEnabled = value != null;
+        OpenInVisualStudioEnabled = value != null && File.Exists(_visualStudioPath);
+        OpenInVisualStudioCodeEnabled = value != null && File.Exists(_visualStudioCodePath);
     }
 
     /// <summary>
@@ -162,14 +180,21 @@ internal partial class MainWindowViewModel : ViewModelBase
     public async void InitViewModel()
     {
         // Load the settings
-        var vsPath = ConfigManager.LoadValue(ConfigKey.VisualStudioPath, string.Empty);
-        var vscPath = ConfigManager.LoadValue(ConfigKey.VisualStudioCodePath, string.Empty);
+        Mediator.AddAction("LoadPaths", LoadPaths);
 
-        OpenInVisualStudioEnabled = File.Exists(vsPath);
-        OpenInVisualStudioCodeEnabled = File.Exists(vscPath);
+        LoadPaths();
 
         // Load the projects
         await LoadProjectsAsync();
+    }
+
+    /// <summary>
+    /// Loads the path of visual studio and visual studio code
+    /// </summary>
+    private void LoadPaths()
+    {
+        _visualStudioPath = ConfigManager.LoadValue(ConfigKey.VisualStudioPath, string.Empty);
+        _visualStudioCodePath = ConfigManager.LoadValue(ConfigKey.VisualStudioCodePath, string.Empty);
     }
 
     /// <summary>

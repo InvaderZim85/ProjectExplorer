@@ -8,6 +8,7 @@ using ProjectExplorer.Models.Internal;
 using ProjectExplorer.Ui.View;
 using System.Collections.ObjectModel;
 using System.IO;
+using ProjectExplorer.Common;
 
 namespace ProjectExplorer.Ui.ViewModel;
 
@@ -83,12 +84,26 @@ internal partial class SettingsControlViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Gets or sets the value which indicates whether untracked files should be deleted during the GIT clean
+    /// </summary>
+    [ObservableProperty]
+    private bool _optionGitCleanUntracked;
+
+    /// <summary>
+    /// Gets or sets the value which indicates whether ignored files should be deleted during the GIT clean
+    /// </summary>
+    [ObservableProperty]
+    private bool _optionGitCleanIgnored;
+
+    /// <summary>
     /// Init the view model
     /// </summary>
     public void InitViewModel()
     {
         VisualStudioPath = ConfigManager.LoadValue(ConfigKey.VisualStudioPath, string.Empty);
         VisualStudioCodePath = ConfigManager.LoadValue(ConfigKey.VisualStudioCodePath, string.Empty);
+        OptionGitCleanUntracked = ConfigManager.LoadValue(ConfigKey.GitCleanUntracked, false);
+        OptionGitCleanIgnored = ConfigManager.LoadValue(ConfigKey.GitCleanIgnored, false);
         var theme = ConfigManager.LoadValue(ConfigKey.ColorTheme, "Cyan");
 
         AddColors(theme);
@@ -147,20 +162,25 @@ internal partial class SettingsControlViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveSettingsAsync()
     {
-        if (SelectedColorTheme == null)
-            return;
-
         var controller = await ShowProgressAsync("Save", "Please wait while saving the settings...");
 
         try
         {
             // Save the settings
-            await ConfigManager.SaveValuesAsync(new SortedList<ConfigKey, object>
+            var settings = new SortedList<ConfigKey, object>
             {
                 { ConfigKey.VisualStudioPath, VisualStudioPath },
-                { ConfigKey.VisualStudioCodePath, VisualStudioCodePath },
-                { ConfigKey.ColorTheme, SelectedColorTheme }
-            });
+                { ConfigKey.VisualStudioCodePath, VisualStudioCodePath},
+                { ConfigKey.GitCleanUntracked, OptionGitCleanUntracked},
+                { ConfigKey.GitCleanIgnored, OptionGitCleanIgnored}
+            };
+
+            if (SelectedColorTheme != null)
+                settings.Add(ConfigKey.ColorTheme, SelectedColorTheme);
+
+            await ConfigManager.SaveValuesAsync(settings);
+
+            Mediator.ExecuteAction("LoadPaths");
         }
         catch (Exception ex)
         {
